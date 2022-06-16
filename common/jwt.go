@@ -15,8 +15,8 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// ReleaseToken 发放token
 func ReleaseToken(user model.User) (string, error) {
-	// 发放token
 
 	// 获取token时间信息
 	issue := time.Now()
@@ -49,4 +49,15 @@ func ReleaseToken(user model.User) (string, error) {
 
 	return tokenString, nil
 
+}
+
+// ParseToken 通过接收到的tokenString解析token结构体
+func ParseToken(tokenString string) (*jwt.Token, *Claims, error) {
+	claims := &Claims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	return token, claims, err
 }

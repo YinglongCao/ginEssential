@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
+// GenerateName 生成length位随机用户名
 func GenerateName(length int) string {
-	// 生成length位随机用户名
 
 	// 字母表
 	var letters = []byte("abcdefghijklmnopqrstuvwxyz")

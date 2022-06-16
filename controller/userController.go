@@ -2,7 +2,9 @@ package controller
 
 import (
 	"ginEssential/common"
+	"ginEssential/dto"
 	"ginEssential/model"
+	"ginEssential/response"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -11,8 +13,8 @@ import (
 	"net/http"
 )
 
+// Register 注册监听
 func Register(ctx *gin.Context) {
-	// 注册监听
 
 	db := common.GetDB()
 
@@ -24,7 +26,7 @@ func Register(ctx *gin.Context) {
 	// 数据验证
 	// 判断用户名长度
 	if len(name) > 12 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "用户名不能大于6位"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户名不能大于6位")
 		return
 	}
 
@@ -36,19 +38,19 @@ func Register(ctx *gin.Context) {
 
 	// 密码长度必须在8-16之间
 	if len(password) < 8 || len(password) > 16 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "密码必须为8到16位"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码必须为8到16位")
 		return
 	}
 
 	// 电话非11位返回422
 	if len(telephone) != 11 {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "请输入正确的电话号码"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "请输入正确的电话号码")
 		return
 	}
 
 	// 电话已存在返回422
 	if IsTelephoneExist(db, telephone) {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "手机号已被注册"})
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号已被注册")
 		return
 	}
 
@@ -57,7 +59,7 @@ func Register(ctx *gin.Context) {
 	// 密码使用哈希保存
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": 500, "msg": "内部数据错误"})
+		response.Response(ctx, http.StatusInternalServerError, 500, nil, "内部数据错误")
 		log.Printf("Registor() hashedPassword error: %v", err)
 		return
 	}
@@ -73,20 +75,15 @@ func Register(ctx *gin.Context) {
 	log.Println(name, telephone, hashedPassword)
 
 	// 返回结果
-	ctx.JSON(200, gin.H{
-		"code": 200,
-		"data": gin.H{
-			"name":      name,
-			"telephone": telephone,
-			"password":  hashedPassword,
-		},
-		"msg": "register success",
-	})
+	response.Success(ctx, gin.H{
+		"name":      name,
+		"telephone": telephone,
+	}, "注册成功")
 
 }
 
+// Login 登录监听
 func Login(ctx *gin.Context) {
-	// 登录监听
 
 	db := common.GetDB()
 
@@ -140,8 +137,19 @@ func Login(ctx *gin.Context) {
 
 }
 
+// Info 获取用户信息监听
+func Info(ctx *gin.Context) {
+	// 获取用户信息应该能从上下文中查找到
+
+	user, _ := ctx.Get("user")
+
+	// 转换成UserDto结构体, 并返回
+	ctx.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": dto.UserToDto(user.(model.User))}, "msg": "获取信息成功"})
+
+}
+
+// IsTelephoneExist 判断电话是否已存在
 func IsTelephoneExist(db *gorm.DB, telephone string) bool {
-	// 判断电话是否已存在
 
 	// 创建User结构对象
 	var user model.User

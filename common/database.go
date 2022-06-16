@@ -9,8 +9,8 @@ import (
 
 var db *gorm.DB
 
+// InitDB 初始化连接池
 func InitDB() *gorm.DB {
-	// 初始化连接池
 
 	// args
 	host := "localhost"
