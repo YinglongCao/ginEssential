@@ -32,7 +32,7 @@ func InitDB() *gorm.DB {
 		panic("database connect err:" + err.Error())
 	}
 
-	// 自动创建数据库字段
+	// 自动创建数据表
 	err = db.AutoMigrate(&model.User{})
 	if err != nil {
 		return nil
@@ -43,6 +43,8 @@ func InitDB() *gorm.DB {
 }
 
 func GetDB() *gorm.DB {
-	fmt.Println(db)
+	if db == nil {
+		panic("GetDB() db is nil")
+	}
 	return db
 }

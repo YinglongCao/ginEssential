@@ -1,8 +1,6 @@
 package util
 
 import (
-	"ginEssential/model"
-	"gorm.io/gorm"
 	"math/rand"
 	"time"
 )
@@ -23,20 +21,4 @@ func GenerateName(length int) string {
 	}
 
 	return string(result)
-}
-
-func IsTelephoneExist(db *gorm.DB, telephone string) bool {
-	// 判断电话是否已存在
-
-	// 创建User结构对象
-	var user model.User
-	// 根据电话查询用户结构
-	db.Where("telephone = ?", telephone).First(&user)
-	// 判断查询结构
-	if user.ID != 0 {
-		// 查询到ID非0则存在
-		return true
-	}
-	// 否则不存在
-	return false
 }

@@ -18,6 +18,9 @@ func CollectRouter(r *gin.Engine) *gin.Engine {
 	// 注册请求
 	r.POST("/api/auth/register", controller.Register)
 
+	// 登录路由
+	r.POST("api/auth/login", controller.Login)
+
 	return r
 
 }
