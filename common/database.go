@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"ginEssential/model"
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -13,12 +14,12 @@ var db *gorm.DB
 func InitDB() *gorm.DB {
 
 	// args
-	host := "localhost"
-	port := "33066"
-	user := "root"
-	password := "root"
-	database := "ginEssential"
-	charset := "utf8mb4"
+	host := viper.GetString("datasource.host")
+	port := viper.GetString("datasource.port")
+	user := viper.GetString("datasource.username")
+	password := viper.GetString("datasource.password")
+	database := viper.GetString("datasource.database")
+	charset := viper.GetString("datasource.charset")
 
 	// DSN
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true", user, password, host, port, database, charset)
@@ -29,7 +30,7 @@ func InitDB() *gorm.DB {
 	db, err = gorm.Open(mysql.Open(args), &gorm.Config{})
 
 	if err != nil {
-		panic("database connect err:" + err.Error())
+		panic("InitDB() 数据库连接错误" + err.Error())
 	}
 
 	// 自动创建数据表
